@@ -50,6 +50,7 @@ packages = [{ include = "htpheno" }]
 
 [tool.poetry.dependencies]
 python = ">=3.6.8,<3.12"
+humanize = "~3.14"
 radosgw-admin = "~1.7"
 
 
@@ -63,6 +64,10 @@ pre-commit = "~2.17"
 pylint = "~2.13"
 "ruamel.yaml.cmd" = "~0.6"
 safety = "~2.3"
+
+
+[tool.poetry.scripts]
+radosgw-admin-client = "htpheno.radosgw_admin_client:entrypoint"
 
 
 [tool.pylint.messages-control]

@@ -4,7 +4,7 @@
 .PHONY: all build clean lint reformat
 
 PY_FILES := htpheno/
-PY_WHEEL_BASENAME := htpheno
+PY_WHEEL_BASENAME := radosgw_admin_client
 
 all: reformat lint build
 
@@ -31,3 +31,4 @@ clean:
 	rm -rf .mypy_cache/
 	rm -rf dist/$(PY_WHEEL_BASENAME)-*.tar.gz
 	rm -rf dist/$(PY_WHEEL_BASENAME)-*.whl
+	-rmdir dist/

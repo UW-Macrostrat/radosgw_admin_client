@@ -205,7 +205,7 @@ def parse_args() -> argparse.Namespace:
 
     delete_user_parser = subparsers.add_parser("delete-user")
     delete_user_parser.add_argument("uid")
-    create_user_parser.set_defaults(func=delete_user)
+    delete_user_parser.set_defaults(func=delete_user)
 
     get_quota_parser = subparsers.add_parser("get-quota")
     get_quota_parser.add_argument("uid")

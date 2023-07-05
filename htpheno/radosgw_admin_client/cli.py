@@ -24,7 +24,11 @@ class UserError(RuntimeError):
 # --------------------------------------------------------------------------
 
 
-def get_connection() -> radosgw.connection.RadosGWAdminConnection:
+def get_connection(  # nosec hardcoded_password_default
+    access_key: str = "",
+    secret_key: str = "",
+    admin_path: str = "/admin",
+) -> radosgw.connection.RadosGWAdminConnection:
     # pylint: disable=raise-missing-from
     """
     Returns a connection object for the Rados Gateway.
@@ -44,12 +48,12 @@ def get_connection() -> radosgw.connection.RadosGWAdminConnection:
         raise UserError("'RADOSGW_HOST' not set in the environment")
 
     try:
-        access_key = os.environ["RADOSGW_ACCESS_KEY"]
+        access_key = access_key or os.environ["RADOSGW_ACCESS_KEY"]
     except KeyError:
         raise UserError("'RADOSGW_ACCESS_KEY' not set in the environment")
 
     try:
-        secret_key = os.environ["RADOSGW_SECRET_KEY"]
+        secret_key = secret_key or os.environ["RADOSGW_SECRET_KEY"]
     except KeyError:
         raise UserError("'RADOSGW_SECRET_KEY' not set in the environment")
 
@@ -57,6 +61,7 @@ def get_connection() -> radosgw.connection.RadosGWAdminConnection:
         host=host,
         access_key=access_key,
         secret_key=secret_key,
+        admin_path=admin_path,
     )
 
 
@@ -168,6 +173,99 @@ def set_quota(args: argparse.Namespace) -> None:
     )
 
 
+def get_bucket(args: argparse.Namespace) -> None:
+    conn = get_connection()
+    bucket = conn.get_bucket(args.bucket_name)
+
+    print_json(
+        {
+            "name": bucket.name,
+            "policy": bucket.policy(),
+        }
+    )
+
+
+def create_bucket(args: argparse.Namespace) -> None:
+    conn = get_connection()
+    user = conn.get_user(args.uid)
+
+    conn = get_connection(
+        access_key=user.keys[0].access_key,
+        secret_key=user.keys[0].secret_key,
+        admin_path="",
+    )
+
+    r = conn.make_request("PUT", path=f"/{args.bucket_name}")
+    b = conn._process_response(r)
+
+    print("OK" if b is None else "ERROR?")
+
+
+def allow_read(args: argparse.Namespace) -> None:
+    conn = get_connection()
+    bucket = conn.get_bucket(args.bucket_name)
+    user = conn.get_user(bucket.owner)
+
+    conn = get_connection(
+        access_key=user.keys[0].access_key,
+        secret_key=user.keys[0].secret_key,
+        admin_path="",
+    )
+
+    r = conn.make_request("GET", path=f"/{args.bucket_name}?policy")
+    b = conn._process_response(r)
+
+    new_statements = [
+        {
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:ListBucket",
+                "s3:ListBucketMultipartUploads",
+            ],
+            "Effect": "Allow",
+            "Principal": {"AWS": [f"arn:aws:iam:::user/{args.uid_of_reader}"]},
+            "Resource": [f"arn:aws:s3:::{args.bucket_name}"],
+            "Sid": "",
+        },
+        {
+            "Action": ["s3:GetObject", "s3:ListMultipartUploadParts"],
+            "Effect": "Allow",
+            "Principal": {"AWS": [f"arn:aws:iam:::user/{args.uid_of_reader}"]},
+            "Resource": [f"arn:aws:s3:::{args.bucket_name}/*"],
+            "Sid": "",
+        },
+    ]
+
+    new_policy = {
+        "Statement": json.loads(b).get("Statement", []) + new_statements,
+        "Version": "2012-10-17",
+    }
+
+    r = conn.make_request(
+        "PUT",
+        path=f"/{args.bucket_name}?policy",
+        data=json.dumps(new_policy),
+    )
+
+
+def make_private(args: argparse.Namespace) -> None:
+    conn = get_connection()
+    bucket = conn.get_bucket(args.bucket_name)
+    user = conn.get_user(bucket.owner)
+
+    conn = get_connection(
+        access_key=user.keys[0].access_key,
+        secret_key=user.keys[0].secret_key,
+        admin_path="",
+    )
+
+    conn.make_request(
+        "PUT",
+        path=f"/{args.bucket_name}?policy",
+        data="{}",
+    )
+
+
 # --------------------------------------------------------------------------
 
 
@@ -218,6 +316,24 @@ def parse_args() -> argparse.Namespace:
         "max_objects", type=int, nargs="?", default=10_000_000
     )
     set_quota_parser.set_defaults(func=set_quota)
+
+    get_bucket_parser = subparsers.add_parser("get-bucket")
+    get_bucket_parser.add_argument("bucket_name")
+    get_bucket_parser.set_defaults(func=get_bucket)
+
+    create_bucket_parser = subparsers.add_parser("create-bucket")
+    create_bucket_parser.add_argument("uid")
+    create_bucket_parser.add_argument("bucket_name")
+    create_bucket_parser.set_defaults(func=create_bucket)
+
+    allow_read_parser = subparsers.add_parser("allow-read")
+    allow_read_parser.add_argument("bucket_name")
+    allow_read_parser.add_argument("uid_of_reader")
+    allow_read_parser.set_defaults(func=allow_read)
+
+    make_private_parser = subparsers.add_parser("make-private")
+    make_private_parser.add_argument("bucket_name")
+    make_private_parser.set_defaults(func=make_private)
 
     return parser.parse_args()
 

@@ -213,7 +213,14 @@ def allow_read(args: argparse.Namespace) -> None:
     )
 
     r = conn.make_request("GET", path=f"/{args.bucket_name}?policy")
-    b = conn._process_response(r)
+    body = r.read()
+    b = "{}"
+
+    if r.status == 200:
+        if isinstance(body, bytes) and hasattr(body, "decode"):
+            b = body.decode("utf-8")
+        else:
+            b = body
 
     new_statements = [
         {

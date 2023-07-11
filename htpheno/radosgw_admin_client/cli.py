@@ -79,6 +79,13 @@ def print_json(obj: Union[Dict[Any, Any], List[Any]]) -> None:
 # --------------------------------------------------------------------------
 
 
+def jsonify_bucket(bucket: radosgw.bucket.BucketInfo) -> Dict[str, Any]:
+    return {
+        "name": bucket.name,
+        "owner": bucket.owner,
+    }
+
+
 def jsonify_cap(cap: radosgw.user.Cap) -> str:
     return f"{cap.type}={cap.perm}"
 
@@ -173,16 +180,17 @@ def set_quota(args: argparse.Namespace) -> None:
     )
 
 
+def get_buckets(args: argparse.Namespace) -> None:
+    conn = get_connection()
+    buckets = conn.get_buckets(uid=args.uid)
+
+    print_json([jsonify_bucket(b) for b in buckets])
+
+
 def get_bucket(args: argparse.Namespace) -> None:
     conn = get_connection()
-    bucket = conn.get_bucket(args.bucket_name)
 
-    print_json(
-        {
-            "name": bucket.name,
-            "policy": bucket.policy(),
-        }
-    )
+    print_json(jsonify_bucket(conn.get_bucket(args.bucket_name)))
 
 
 def create_bucket(args: argparse.Namespace) -> None:
@@ -323,6 +331,10 @@ def parse_args() -> argparse.Namespace:
         "max_objects", type=int, nargs="?", default=10_000_000
     )
     set_quota_parser.set_defaults(func=set_quota)
+
+    get_buckets_parser = subparsers.add_parser("get-buckets")
+    get_buckets_parser.add_argument("uid", nargs="?", default=None)
+    get_buckets_parser.set_defaults(func=get_buckets)
 
     get_bucket_parser = subparsers.add_parser("get-bucket")
     get_bucket_parser.add_argument("bucket_name")

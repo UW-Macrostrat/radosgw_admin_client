@@ -327,9 +327,7 @@ def parse_args() -> argparse.Namespace:
     set_quota_parser = subparsers.add_parser("set-quota")
     set_quota_parser.add_argument("uid")
     set_quota_parser.add_argument("max_size_gb", type=int)
-    set_quota_parser.add_argument(
-        "max_objects", type=int, nargs="?", default=10_000_000
-    )
+    set_quota_parser.add_argument("max_objects", type=int, nargs="?", default=10_000_000)
     set_quota_parser.set_defaults(func=set_quota)
 
     get_buckets_parser = subparsers.add_parser("get-buckets")

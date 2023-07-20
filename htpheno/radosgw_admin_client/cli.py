@@ -232,18 +232,14 @@ def allow_read(args: argparse.Namespace) -> None:
 
     new_statements = [
         {
-            "Action": [
-                "s3:GetBucketLocation",
-                "s3:ListBucket",
-                "s3:ListBucketMultipartUploads",
-            ],
+            "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
             "Effect": "Allow",
             "Principal": {"AWS": [f"arn:aws:iam:::user/{args.uid_of_reader}"]},
             "Resource": [f"arn:aws:s3:::{args.bucket_name}"],
             "Sid": "",
         },
         {
-            "Action": ["s3:GetObject", "s3:ListMultipartUploadParts"],
+            "Action": ["s3:GetObject"],
             "Effect": "Allow",
             "Principal": {"AWS": [f"arn:aws:iam:::user/{args.uid_of_reader}"]},
             "Resource": [f"arn:aws:s3:::{args.bucket_name}/*"],

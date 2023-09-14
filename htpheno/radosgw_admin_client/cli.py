@@ -259,6 +259,56 @@ def allow_read(args: argparse.Namespace) -> None:
     )
 
 
+def allow_public_read(args: argparse.Namespace) -> None:
+    conn = get_connection()
+    bucket = conn.get_bucket(args.bucket_name)
+    user = conn.get_user(bucket.owner)
+
+    conn = get_connection(
+        access_key=user.keys[0].access_key,
+        secret_key=user.keys[0].secret_key,
+        admin_path="",
+    )
+
+    r = conn.make_request("GET", path=f"/{args.bucket_name}?policy")
+    body = r.read()
+    b = "{}"
+
+    if r.status == 200:
+        if isinstance(body, bytes) and hasattr(body, "decode"):
+            b = body.decode("utf-8")
+        else:
+            b = body
+
+    new_statements = [
+        {
+            "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+            "Effect": "Allow",
+            "Principal": {"AWS": ["*"]},
+            "Resource": [f"arn:aws:s3:::{args.bucket_name}"],
+            "Sid": "",
+        },
+        {
+            "Action": ["s3:GetObject"],
+            "Effect": "Allow",
+            "Principal": {"AWS": ["*"]},
+            "Resource": [f"arn:aws:s3:::{args.bucket_name}/*"],
+            "Sid": "",
+        },
+    ]
+
+    new_policy = {
+        "Statement": json.loads(b).get("Statement", []) + new_statements,
+        "Version": "2012-10-17",
+    }
+
+    r = conn.make_request(
+        "PUT",
+        path=f"/{args.bucket_name}?policy",
+        data=json.dumps(new_policy),
+    )
+
+
 def allow_write(args: argparse.Namespace) -> None:
     conn = get_connection()
     bucket = conn.get_bucket(args.bucket_name)
@@ -398,6 +448,10 @@ def parse_args() -> argparse.Namespace:
     allow_read_parser.add_argument("bucket_name")
     allow_read_parser.add_argument("uid_of_reader")
     allow_read_parser.set_defaults(func=allow_read)
+
+    allow_public_read_parser = subparsers.add_parser("allow-public-read")
+    allow_public_read_parser.add_argument("bucket_name")
+    allow_public_read_parser.set_defaults(func=allow_public_read)
 
     allow_write_parser = subparsers.add_parser("allow-write")
     allow_write_parser.add_argument("bucket_name")

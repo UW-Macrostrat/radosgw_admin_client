@@ -40,7 +40,7 @@ sqlite_cache = true
 
 [tool.poetry]
 name = "radosgw_admin_client"
-version = "0.5.0"
+version = "0.6.0"
 description = "Python client for the Rados Gateway Admin Operations API"
 license = "Apache-2.0"
 authors = ["Brian Aydemir <baydemir@morgridge.org>"]

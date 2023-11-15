@@ -232,14 +232,20 @@ def allow_read(args: argparse.Namespace) -> None:
 
     new_statements = [
         {
-            "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:ListBucket",
+            ],
             "Effect": "Allow",
             "Principal": {"AWS": [f"arn:aws:iam:::user/{args.uid_of_reader}"]},
             "Resource": [f"arn:aws:s3:::{args.bucket_name}"],
             "Sid": "",
         },
         {
-            "Action": ["s3:GetObject"],
+            "Action": [
+                "s3:GetObject",
+                "S3:GetObjectVersion",
+            ],
             "Effect": "Allow",
             "Principal": {"AWS": [f"arn:aws:iam:::user/{args.uid_of_reader}"]},
             "Resource": [f"arn:aws:s3:::{args.bucket_name}/*"],
@@ -282,14 +288,20 @@ def allow_public_read(args: argparse.Namespace) -> None:
 
     new_statements = [
         {
-            "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:ListBucket",
+            ],
             "Effect": "Allow",
             "Principal": {"AWS": ["*"]},
             "Resource": [f"arn:aws:s3:::{args.bucket_name}"],
             "Sid": "",
         },
         {
-            "Action": ["s3:GetObject"],
+            "Action": [
+                "s3:GetObject",
+                "S3:GetObjectVersion",
+            ],
             "Effect": "Allow",
             "Principal": {"AWS": ["*"]},
             "Resource": [f"arn:aws:s3:::{args.bucket_name}/*"],
@@ -332,7 +344,10 @@ def allow_write(args: argparse.Namespace) -> None:
 
     new_statements = [
         {
-            "Action": ["s3:GetBucketLocation", "s3:ListBucketMultipartUploads"],
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:ListBucketMultipartUploads",
+            ],
             "Effect": "Allow",
             "Principal": {"AWS": [f"arn:aws:iam:::user/{args.uid_of_writer}"]},
             "Resource": [f"arn:aws:s3:::{args.bucket_name}"],
@@ -342,8 +357,10 @@ def allow_write(args: argparse.Namespace) -> None:
             "Action": [
                 "s3:AbortMultipartUpload",
                 "s3:DeleteObject",
+                "s3:DeleteObjectVersion",
                 "s3:ListMultipartUploadParts",
                 "s3:PutObject",
+                "s3:PutObjectVersion",
             ],
             "Effect": "Allow",
             "Principal": {"AWS": [f"arn:aws:iam:::user/{args.uid_of_writer}"]},

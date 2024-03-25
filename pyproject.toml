@@ -43,7 +43,9 @@ name = "radosgw_admin_client"
 version = "0.6.0"
 description = "Python client for the Rados Gateway Admin Operations API"
 license = "Apache-2.0"
-authors = ["Brian Aydemir <baydemir@morgridge.org>"]
+authors = [
+    "Brian Aydemir <baydemir@morgridge.org>",
+]
 repository = "https://github.com/HTPhenotyping/radosgw_admin_client"
 packages = [{ include = "htpheno" }]
 

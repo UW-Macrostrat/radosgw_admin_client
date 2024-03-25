@@ -1,13 +1,13 @@
-boto==2.49.0 ; python_full_version >= "3.6.8" and python_version < "3.12" \
+boto==2.49.0 ; python_full_version >= "3.6.8" and python_full_version < "4.0.0" \
     --hash=sha256:147758d41ae7240dc989f0039f27da8ca0d53734be0eb869ef16e3adcfa462e8 \
     --hash=sha256:ea0d3b40a2d852767be77ca343b58a9e3a4b00d9db440efb8da74b4e58025e5a
-humanize==3.14.0 ; python_full_version >= "3.6.8" and python_version < "3.12" \
+humanize==3.14.0 ; python_full_version >= "3.6.8" and python_full_version < "4.0.0" \
     --hash=sha256:32bcf712ac98ff5e73627a9d31e1ba5650619008d6d13543b5d53b48e8ab8d43 \
     --hash=sha256:60dd8c952b1df1ad83f0903844dec50a34ba7a04eea22a6b14204ffb62dbb0a4
 importlib-metadata==4.8.3 ; python_full_version >= "3.6.8" and python_version < "3.8" \
     --hash=sha256:65a9576a5b2d58ca44d133c42a241905cc45e34d2c06fd5ba2bafa221e5d7b5e \
     --hash=sha256:766abffff765960fcc18003801f7044eb6755ffae4521c8e8ce8e83b9c9b0668
-radosgw-admin==1.7.2 ; python_full_version >= "3.6.8" and python_version < "3.12" \
+radosgw-admin==1.7.2 ; python_full_version >= "3.6.8" and python_full_version < "4.0.0" \
     --hash=sha256:ac05f78ec41caaef4209f90932b857704aa031017bf31faa7f30ec0d7fc80471 \
     --hash=sha256:c22ade8e75397717a37ffa9277be2658d2e71c09942eac8eb9d5807a751abf30
 typing-extensions==4.1.1 ; python_full_version >= "3.6.8" and python_version < "3.8" \

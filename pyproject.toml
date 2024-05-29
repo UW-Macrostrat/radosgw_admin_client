@@ -58,12 +58,12 @@ radosgw-admin = "~1.7"
 
 [tool.poetry.group.dev.dependencies]
 bandit = "~1.7"
-black = "~24.3"
-docutils = "~0.20"
+black = "~24.4"
+docutils = "~0.21"
 isort = "~5.13"
-mypy = "~1.9"
+mypy = "~1.10"
 pre-commit = "~3.7"
-pylint = "~3.1"
+pylint = "~3.2"
 
 
 [tool.poetry.scripts]

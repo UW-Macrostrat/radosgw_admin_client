@@ -10,9 +10,9 @@ import re
 import sys
 from typing import Any, Dict, List, Union
 
-import humanize  # type: ignore[import]
-import radosgw  # type: ignore[import]
-import radosgw.user  # type: ignore[import]
+import humanize
+import radosgw  # type: ignore[import-untyped]
+import radosgw.user  # type: ignore[import-untyped]
 
 
 class UserError(RuntimeError):
@@ -74,6 +74,10 @@ def is_system_user(uid: str) -> bool:
 
 def print_json(obj: Union[Dict[Any, Any], List[Any]]) -> None:
     print(json.dumps(obj, indent=2))
+
+
+def uniq(xs: List[Any]) -> List[Any]:
+    return list(sorted(set(xs)))
 
 
 # --------------------------------------------------------------------------
@@ -254,7 +258,7 @@ def allow_read(args: argparse.Namespace) -> None:
     ]
 
     new_policy = {
-        "Statement": json.loads(b).get("Statement", []) + new_statements,
+        "Statement": uniq(json.loads(b).get("Statement", []) + new_statements),
         "Version": "2012-10-17",
     }
 
@@ -310,7 +314,7 @@ def allow_public_read(args: argparse.Namespace) -> None:
     ]
 
     new_policy = {
-        "Statement": json.loads(b).get("Statement", []) + new_statements,
+        "Statement": uniq(json.loads(b).get("Statement", []) + new_statements),
         "Version": "2012-10-17",
     }
 
@@ -370,7 +374,7 @@ def allow_write(args: argparse.Namespace) -> None:
     ]
 
     new_policy = {
-        "Statement": json.loads(b).get("Statement", []) + new_statements,
+        "Statement": uniq(json.loads(b).get("Statement", []) + new_statements),
         "Version": "2012-10-17",
     }
 

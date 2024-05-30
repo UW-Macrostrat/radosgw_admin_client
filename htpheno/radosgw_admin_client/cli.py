@@ -72,12 +72,15 @@ def is_system_user(uid: str) -> bool:
     return bool(re.search(r"admin|rook-ceph|system", uid))
 
 
+def simplify(xs: List[Any]) -> List[Any]:
+    """
+    Attempts to remove duplicate bucket policy statements.
+    """
+    return [json.loads(x) for x in sorted(set(json.dumps(x) for x in xs))]
+
+
 def print_json(obj: Union[Dict[Any, Any], List[Any]]) -> None:
     print(json.dumps(obj, indent=2))
-
-
-def uniq(xs: List[Any]) -> List[Any]:
-    return list(sorted(set(xs)))
 
 
 # --------------------------------------------------------------------------
@@ -213,6 +216,30 @@ def create_bucket(args: argparse.Namespace) -> None:
     print("OK" if b is None else "ERROR?")
 
 
+def get_policy(args: argparse.Namespace) -> None:
+    conn = get_connection()
+    bucket = conn.get_bucket(args.bucket_name)
+    user = conn.get_user(bucket.owner)
+
+    conn = get_connection(
+        access_key=user.keys[0].access_key,
+        secret_key=user.keys[0].secret_key,
+        admin_path="",
+    )
+
+    r = conn.make_request("GET", path=f"/{args.bucket_name}?policy")
+    body = r.read()
+    b = "{}"
+
+    if r.status == 200:
+        if isinstance(body, bytes) and hasattr(body, "decode"):
+            b = body.decode("utf-8")
+        else:
+            b = body
+
+    print(json.dumps(json.loads(b), indent=2))
+
+
 def allow_read(args: argparse.Namespace) -> None:
     conn = get_connection()
     bucket = conn.get_bucket(args.bucket_name)
@@ -258,7 +285,7 @@ def allow_read(args: argparse.Namespace) -> None:
     ]
 
     new_policy = {
-        "Statement": uniq(json.loads(b).get("Statement", []) + new_statements),
+        "Statement": simplify(json.loads(b).get("Statement", []) + new_statements),
         "Version": "2012-10-17",
     }
 
@@ -267,6 +294,9 @@ def allow_read(args: argparse.Namespace) -> None:
         path=f"/{args.bucket_name}?policy",
         data=json.dumps(new_policy),
     )
+
+    if body := r.read():
+        print("Error:", body)
 
 
 def allow_public_read(args: argparse.Namespace) -> None:
@@ -314,7 +344,7 @@ def allow_public_read(args: argparse.Namespace) -> None:
     ]
 
     new_policy = {
-        "Statement": uniq(json.loads(b).get("Statement", []) + new_statements),
+        "Statement": simplify(json.loads(b).get("Statement", []) + new_statements),
         "Version": "2012-10-17",
     }
 
@@ -323,6 +353,9 @@ def allow_public_read(args: argparse.Namespace) -> None:
         path=f"/{args.bucket_name}?policy",
         data=json.dumps(new_policy),
     )
+
+    if body := r.read():
+        print("Error:", body)
 
 
 def allow_write(args: argparse.Namespace) -> None:
@@ -364,7 +397,6 @@ def allow_write(args: argparse.Namespace) -> None:
                 "s3:DeleteObjectVersion",
                 "s3:ListMultipartUploadParts",
                 "s3:PutObject",
-                "s3:PutObjectVersion",
             ],
             "Effect": "Allow",
             "Principal": {"AWS": [f"arn:aws:iam:::user/{args.uid_of_writer}"]},
@@ -374,7 +406,7 @@ def allow_write(args: argparse.Namespace) -> None:
     ]
 
     new_policy = {
-        "Statement": uniq(json.loads(b).get("Statement", []) + new_statements),
+        "Statement": simplify(json.loads(b).get("Statement", []) + new_statements),
         "Version": "2012-10-17",
     }
 
@@ -383,6 +415,9 @@ def allow_write(args: argparse.Namespace) -> None:
         path=f"/{args.bucket_name}?policy",
         data=json.dumps(new_policy),
     )
+
+    if body := r.read():
+        print("Error:", body)
 
 
 def make_private(args: argparse.Namespace) -> None:
@@ -464,6 +499,10 @@ def parse_args() -> argparse.Namespace:
     create_bucket_parser.add_argument("uid")
     create_bucket_parser.add_argument("bucket_name")
     create_bucket_parser.set_defaults(func=create_bucket)
+
+    get_policy_parser = subparsers.add_parser("get-policy")
+    get_policy_parser.add_argument("bucket_name")
+    get_policy_parser.set_defaults(func=get_policy)
 
     allow_read_parser = subparsers.add_parser("allow-read")
     allow_read_parser.add_argument("bucket_name")

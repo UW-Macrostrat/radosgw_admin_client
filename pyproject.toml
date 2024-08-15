@@ -40,8 +40,8 @@ sqlite_cache = true
 
 [tool.poetry]
 name = "radosgw_admin_client"
-version = "0.8.0"
-description = "Python client for the Rados Gateway Admin Operations API"
+version = "0.8.1"
+description = "Client for the Ceph Object Gateway Admin Operations API"
 license = "Apache-2.0"
 authors = [
     "Brian Aydemir <baydemir@morgridge.org>",
@@ -52,17 +52,17 @@ packages = [{ include = "htpheno" }]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-humanize = "~4.9"
+humanize = "~4.10"
 radosgw-admin = "~1.7"
 
 
 [tool.poetry.group.dev.dependencies]
 bandit = "~1.7"
-black = "~24.4"
+black = "~24.8"
 docutils = "~0.21"
 isort = "~5.13"
-mypy = "~1.10"
-pre-commit = "~3.7"
+mypy = "~1.11"
+pre-commit = "~3.8"
 pylint = "~3.2"
 
 

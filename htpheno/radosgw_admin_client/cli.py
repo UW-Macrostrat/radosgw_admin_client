@@ -1,5 +1,5 @@
 """
-Python client for the Rados Gateway Admin Operations API.
+Client for the Ceph Object Gateway Admin Operations API.
 """
 
 import argparse
@@ -31,7 +31,7 @@ def get_connection(  # nosec hardcoded_password_default
 ) -> radosgw.connection.RadosGWAdminConnection:
     # pylint: disable=raise-missing-from
     """
-    Returns a connection object for the Rados Gateway.
+    Returns a connection object for the Ceph Object Gateway.
     """
 
     try:

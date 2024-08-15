@@ -1,5 +1,5 @@
 """
-Python client for the Rados Gateway Admin Operations API.
+Client for the Ceph Object Gateway Admin Operations API.
 """
 
 from . import cli

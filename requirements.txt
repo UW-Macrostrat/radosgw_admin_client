@@ -1,9 +1,9 @@
 boto==2.49.0 ; python_version >= "3.9" and python_version < "4.0" \
     --hash=sha256:147758d41ae7240dc989f0039f27da8ca0d53734be0eb869ef16e3adcfa462e8 \
     --hash=sha256:ea0d3b40a2d852767be77ca343b58a9e3a4b00d9db440efb8da74b4e58025e5a
-humanize==4.9.0 ; python_version >= "3.9" and python_version < "4.0" \
-    --hash=sha256:582a265c931c683a7e9b8ed9559089dea7edcf6cc95be39a3cbc2c5d5ac2bcfa \
-    --hash=sha256:ce284a76d5b1377fd8836733b983bfb0b76f1aa1c090de2566fcf008d7f6ab16
+humanize==4.10.0 ; python_version >= "3.9" and python_version < "4.0" \
+    --hash=sha256:06b6eb0293e4b85e8d385397c5868926820db32b9b654b932f57fa41c23c9978 \
+    --hash=sha256:39e7ccb96923e732b5c2e27aeaa3b10a8dfeeba3eb965ba7b74a3eb0e30040a6
 radosgw-admin==1.7.2 ; python_version >= "3.9" and python_version < "4.0" \
     --hash=sha256:ac05f78ec41caaef4209f90932b857704aa031017bf31faa7f30ec0d7fc80471 \
     --hash=sha256:c22ade8e75397717a37ffa9277be2658d2e71c09942eac8eb9d5807a751abf30

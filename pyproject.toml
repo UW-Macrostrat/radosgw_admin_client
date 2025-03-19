@@ -39,7 +39,7 @@ sqlite_cache = true
 
 
 [tool.poetry]
-name = "radosgw_admin_client"
+name = "htpheno.radosgw-admin-client"
 version = "0.8.2"
 description = "Client for the Ceph Object Gateway Admin Operations API"
 license = "Apache-2.0"
@@ -51,7 +51,7 @@ packages = [{ include = "htpheno" }]
 
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.12"
+python = ">=3.9,<4.0"
 humanize = "~4.11"
 radosgw-admin = "~1.7"
 
